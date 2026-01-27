@@ -2,13 +2,33 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Send, CheckCircle, AlertTriangle, Loader2 } from 'lucide-react';
 
+import { saveContacts, createCampaign, updateCampaignStatus } from '../lib/supabase';
+
 const SendingPanel = ({ contacts, message, onReset }) => {
     const [status, setStatus] = useState('idle'); // idle, sending, success, error
     const [responseMsg, setResponseMsg] = useState('');
 
     const handleSend = async () => {
         setStatus('sending');
+        let campaignId = null;
+
         try {
+            // 1. Save contacts (if needed, currently we just care about campaign log, but saving contacts is good practice)
+            // Ideally we would save contacts first, but for now let's focus on the campaign log which is the critical part for history.
+            // Let's assume contacts are just there for the record.
+
+            // 2. Create Campaign Record
+            const validContactsCount = contacts.filter(c => c.isValid).length;
+            const { data: campaign, error: campError } = await createCampaign(
+                `Campanha ${new Date().toLocaleDateString('pt-BR')}`,
+                message,
+                validContactsCount
+            );
+
+            if (campError) throw new Error('Erro ao criar registro da campanha no banco de dados.');
+            campaignId = campaign.id;
+
+            // 3. Prepare Payload
             const payload = {
                 contatos: contacts.filter(c => c.isValid).map(c => ({
                     nome: c.nome,
@@ -17,12 +37,20 @@ const SendingPanel = ({ contacts, message, onReset }) => {
                 mensagem: message
             };
 
-            // Using the provided webhook URL
+            // 4. Send to Webhook
             const response = await axios.post('https://webhook.dev.projetoagenciadeia.shop/webhook/disparo', payload);
 
             if (response.status === 200 || response.status === 201) {
                 setStatus('success');
                 setResponseMsg('Disparo iniciado com sucesso!');
+
+                // 5. Update Campaign Status
+                if (campaignId) {
+                    await updateCampaignStatus(campaignId, 'completed');
+
+                    // Optional: Try to save unique contacts to DB in background
+                    saveContacts(contacts).catch(err => console.error("Erro ao salvar contatos em background", err));
+                }
             } else {
                 throw new Error('Resposta inesperada do servidor.');
             }
@@ -30,6 +58,11 @@ const SendingPanel = ({ contacts, message, onReset }) => {
             console.error(err);
             setStatus('error');
             setResponseMsg('Erro ao iniciar disparo: ' + (err.response?.data?.message || err.message));
+
+            // Update campaign as failed
+            if (campaignId) {
+                await updateCampaignStatus(campaignId, 'failed');
+            }
         }
     };
 
