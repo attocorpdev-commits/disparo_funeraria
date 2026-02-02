@@ -1,108 +1,84 @@
-import React, { useState, useEffect } from 'react';
-import { MessageSquare, Type, Info } from 'lucide-react';
+import React from 'react';
+import { Type, ArrowRight, ArrowLeft, Terminal, MessageSquareDot } from 'lucide-react';
 
 const MessageConfig = ({ initialMessage, onMessageChange, onNext, onBack }) => {
-    const [message, setMessage] = useState(initialMessage || '');
-
-    useEffect(() => {
-        onMessageChange(message);
-    }, [message, onMessageChange]);
-
-    const insertVariable = (variable) => {
-        setMessage(prev => prev + ` {${variable}} `);
-    };
-
-    const isValid = message.trim().length > 0;
-
-    // Simple preview with mock data
-    const previewMessage = message.replace(/{nome}/g, 'Maria da Silva');
-
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Editor Side */}
-            <div className="bg-white rounded-lg shadow-sm border border-slate-200 flex flex-col h-full">
-                <div className="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
-                    <h3 className="font-semibold text-slate-800 flex items-center">
-                        <MessageSquare size={18} className="mr-2 text-primary" />
-                        Editor de Mensagem
-                    </h3>
-                    <span className="text-xs text-slate-500">{message.length} caracteres</span>
-                </div>
+        <div className="max-w-3xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="space-y-1">
+                <h2 className="text-3xl font-bold text-white tracking-tight">Configurar Mensagem</h2>
+                <p className="text-slate-400">Escreva o conteúdo que será enviado para seus contatos.</p>
+            </div>
 
-                <div className="p-4 flex-1 flex flex-col">
-                    <div className="mb-4">
-                        <label className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2 block">
-                            Variáveis Disponíveis
+            <div className="glass-card rounded-3xl p-8 border border-white/5 space-y-6">
+                <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                        <label className="text-sm font-bold text-slate-300 flex items-center gap-2">
+                            <Type size={16} className="text-primary" />
+                            CORPO DA MENSAGEM
                         </label>
-                        <div className="flex space-x-2">
-                            <button
-                                onClick={() => insertVariable('nome')}
-                                className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-sm font-medium transition-colors border border-slate-200 flex items-center"
-                            >
-                                <Type size={14} className="mr-1.5" />
-                                Nome do Cliente
-                            </button>
-                        </div>
+                        <span className={`text-[10px] font-bold px-2 py-1 rounded-md border
+                            ${initialMessage.length > 0 ? 'bg-primary/10 text-primary border-primary/20' : 'bg-slate-800 text-slate-500 border-white/5'}
+                        `}>
+                            {initialMessage.length} CARACTERES
+                        </span>
                     </div>
 
-                    <textarea
-                        className="flex-1 w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none text-slate-700 leading-relaxed"
-                        placeholder="Digite sua mensagem aqui..."
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                    />
+                    <div className="relative group">
+                        <textarea
+                            value={initialMessage}
+                            onChange={(e) => onMessageChange(e.target.value)}
+                            placeholder="Olá, como vai? Digite sua mensagem aqui..."
+                            className="w-full min-h-[250px] bg-slate-900/50 border border-white/10 rounded-2xl p-6 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all text-lg leading-relaxed resize-none"
+                        />
+                        <div className="absolute bottom-4 right-4 text-slate-700 pointer-events-none group-focus-within:text-primary transition-colors">
+                            <Terminal size={20} />
+                        </div>
+                    </div>
                 </div>
 
-                <div className="p-4 border-t border-slate-100 flex justify-between">
+                <div className="bg-white/5 rounded-2xl p-6 border border-white/5 space-y-3">
+                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                        <MessageSquareDot size={14} className="text-primary" />
+                        Prévia rápida
+                    </h4>
+                    <p className={`text-sm leading-relaxed ${initialMessage ? 'text-slate-200' : 'text-slate-500 italic'}`}>
+                        {initialMessage || 'A prévia da sua mensagem aparecerá aqui conforme você digita...'}
+                    </p>
+                </div>
+
+                <div className="pt-4 flex gap-4">
                     <button
                         onClick={onBack}
-                        className="px-4 py-2 text-slate-600 hover:bg-slate-50 rounded-lg transition-colors"
+                        className="flex-1 flex items-center justify-center gap-2 py-4 px-6 glass hover:bg-white/5 text-slate-300 font-bold rounded-2xl transition-all border border-white/5"
                     >
-                        Voltar
+                        <ArrowLeft size={18} />
+                        VOLTAR
                     </button>
                     <button
                         onClick={onNext}
-                        disabled={!isValid}
-                        className={`px-6 py-2 rounded-lg font-medium transition-all
-              ${isValid
-                                ? 'bg-primary text-white hover:bg-slate-800 shadow-sm'
-                                : 'bg-slate-200 text-slate-400 cursor-not-allowed'}
-            `}
+                        disabled={!initialMessage.trim()}
+                        className={`flex-[2] flex items-center justify-center gap-2 py-4 px-6 rounded-2xl font-bold transition-all shadow-xl
+                            ${initialMessage.trim()
+                                ? 'bg-primary text-white hover:bg-primary/90 shadow-primary/20 scale-[1.02] active:scale-[0.98]'
+                                : 'bg-slate-800 text-slate-500 cursor-not-allowed'}
+                        `}
                     >
-                        Próximo: Revisão e Disparo
+                        CONTINUAR
+                        <ArrowRight size={18} />
                     </button>
                 </div>
             </div>
 
-            {/* Preview Side */}
-            <div className="space-y-6">
-                <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
-                    <div className="p-4 border-b border-slate-100 bg-blue-50">
-                        <h3 className="font-semibold text-primary flex items-center text-sm uppercase tracking-wide">
-                            <Info size={16} className="mr-2" />
-                            Visualização (Exemplo)
-                        </h3>
-                    </div>
-                    <div className="p-6 bg-slate-50 min-h-[200px] flex items-center justify-center">
-                        <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200 max-w-sm w-full relative">
-                            {/* Mock Message Bubble */}
-                            <div className="bg-[#e7f5ff] p-3 rounded-lg rounded-tl-none text-slate-800 text-sm leading-relaxed whitespace-pre-wrap">
-                                {previewMessage || <span className="text-slate-400 italic">Sua mensagem aparecerá aqui...</span>}
-                            </div>
-                            <div className="mt-1 text-[10px] text-slate-400 text-right">
-                                {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </div>
-                        </div>
-                    </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="glass p-5 rounded-2xl border border-white/5">
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                        <span className="text-primary font-bold">Dica:</span> Use mensagens claras e objetivas para aumentar a taxa de leitura.
+                    </p>
                 </div>
-
-                <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
-                    <h4 className="text-blue-800 font-medium text-sm mb-2">Dicas Importantes</h4>
-                    <ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
-                        <li>Use <strong>{'{nome}'}</strong> para personalizar cada mensagem.</li>
-                        <li>Seja conciso e cordial.</li>
-                        <li>Verifique a ortografia antes de enviar.</li>
-                    </ul>
+                <div className="glass p-5 rounded-2xl border border-white/5">
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                        <span className="text-primary font-bold">Nota:</span> Você poderá revisar tudo na próxima tela antes de iniciar o disparo.
+                    </p>
                 </div>
             </div>
         </div>

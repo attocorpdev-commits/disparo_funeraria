@@ -17,7 +17,7 @@ create table campaigns (
   id uuid default gen_random_uuid() primary key,
   name text not null,
   message_content text,
-  status text default 'draft' check (status in ('draft', 'sending', 'completed', 'failed')),
+  status text default 'draft' check (status in ('draft', 'sending', 'completed', 'failed', 'paused', 'cancelled')),
   total_contacts integer default 0,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
@@ -39,3 +39,14 @@ create table campaign_logs (
 -- Habilitar RLS
 alter table campaign_logs enable row level security;
 create policy "Allow all access to campaign_logs" on campaign_logs for all using (true);
+-- PASSO EXTRA: Configuração de Webhook do Supabase
+-- Você pode configurar isso via interface do Supabase em:
+-- Database -> Webhooks -> Create a new webhook
+-- 1. Nome: 'process_command'
+-- 2. Tabela: 'campaigns'
+-- 3. Events: 'Update'
+-- 4. HTTP Request: POST 'https://webhook.dev.projetoagenciadeia.shop/webhook/5887b9a8-4431-4476-8235-63dcd0a90116'
+-- 5. Payload: (Automaticamente enviado pelo Supabase)
+
+-- Caso prefira via SQL (requer extensão 'net' ativa):
+-- select sql_help('CREATE TRIGGER');
