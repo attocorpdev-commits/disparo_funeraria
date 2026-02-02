@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Papa from 'papaparse';
-import { Upload as UploadIcon, FileText, CheckCircle2, AlertCircle, Loader2, Info } from 'lucide-react';
+import { Upload as UploadIcon, FileText, CheckCircle, AlertCircle, Loader2, Info } from 'lucide-react';
 import { isValidCSVHeader, validatePhone } from '../utils/validators';
 import { saveContacts } from '../lib/supabase';
 
@@ -132,7 +132,7 @@ const UploadSection = ({ onDataLoaded }) => {
                         {isSaving ? (
                             <Loader2 size={36} className="text-white animate-spin" />
                         ) : uploadSuccess ? (
-                            <CheckCircle2 size={36} className="text-white animate-bounce" />
+                            <CheckCircle size={36} className="text-white animate-bounce" />
                         ) : error ? (
                             <AlertCircle size={36} className="text-white" />
                         ) : (

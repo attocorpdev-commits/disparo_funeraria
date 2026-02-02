@@ -1,5 +1,5 @@
 import React from 'react';
-import { Type, ArrowRight, ArrowLeft, Terminal, MessageSquareDot } from 'lucide-react';
+import { Type, ArrowRight, ArrowLeft, Terminal, MessageSquare } from 'lucide-react';
 
 const MessageConfig = ({ initialMessage, onMessageChange, onNext, onBack }) => {
     return (
@@ -38,7 +38,7 @@ const MessageConfig = ({ initialMessage, onMessageChange, onNext, onBack }) => {
 
                 <div className="bg-white/5 rounded-2xl p-6 border border-white/5 space-y-3">
                     <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                        <MessageSquareDot size={14} className="text-primary" />
+                        <MessageSquare size={14} className="text-primary" />
                         Prévia rápida
                     </h4>
                     <p className={`text-sm leading-relaxed ${initialMessage ? 'text-slate-200' : 'text-slate-500 italic'}`}>

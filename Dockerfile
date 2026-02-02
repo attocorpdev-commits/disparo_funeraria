@@ -10,8 +10,16 @@ RUN npm install
 # Copy source code
 COPY . .
 
+# Pass build arguments to Vite during build phase
+ARG VITE_SUPABASE_URL
+ARG VITE_SUPABASE_ANON_KEY
+ARG VITE_WEBHOOK_COMMAND_URL
+
+ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
+ENV VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY
+ENV VITE_WEBHOOK_COMMAND_URL=$VITE_WEBHOOK_COMMAND_URL
+
 # Build the application
-# Note: You should provide VITE_ env vars during build if they are needed
 RUN npm run build
 
 # Production stage

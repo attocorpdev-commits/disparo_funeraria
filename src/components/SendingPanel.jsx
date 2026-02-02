@@ -34,7 +34,8 @@ const SendingPanel = ({ contacts, message, onReset, onViewChange }) => {
                 mensagem: message
             };
 
-            const response = await axios.post('https://webhook.dev.projetoagenciadeia.shop/webhook/disparo', payload);
+            const webhookUrl = import.meta.env.VITE_WEBHOOK_COMMAND_URL || 'https://webhook.dev.projetoagenciadeia.shop/webhook/disparo';
+            const response = await axios.post(webhookUrl, payload);
 
             if (response.status === 200 || response.status === 201) {
                 setStatus('success');
