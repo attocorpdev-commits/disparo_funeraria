@@ -3,7 +3,6 @@ dist
 .git
 .env
 Dockerfile
-nginx.conf
 README.md
 *.csv
 supabase_schema.sql
