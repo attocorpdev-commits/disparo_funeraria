@@ -21,12 +21,25 @@ export const saveContacts = async (contacts) => {
             phone: c.telefone
         }));
 
-    if (validContacts.length === 0) return { error: null, count: 0 };
+    if (validContacts.length === 0) return { error: null, count: 0, data: [] };
 
+    // Use select() to return the records so we get the IDs
     const { data, error } = await supabase
         .from('contacts')
-        .upsert(validContacts, { onConflict: 'phone', ignoreDuplicates: true })
+        .upsert(validContacts, { onConflict: 'phone', ignoreDuplicates: false }) // Allow updates to ensure we get IDs back
         .select();
+
+    return { data, error };
+};
+
+/**
+ * Updates the campaign ID for a list of contacts.
+ */
+export const updateContactsCampaign = async (contactIds, campaignId) => {
+    const { data, error } = await supabase
+        .from('contacts')
+        .update({ id_campanha: campaignId })
+        .in('id', contactIds);
 
     return { data, error };
 };
@@ -35,6 +48,7 @@ export const saveContacts = async (contacts) => {
  * Creates a new campaign record.
  */
 export const createCampaign = async (name, message, totalContacts) => {
+    // We generate a UUID to be used as id_campanha matching the record ID
     const { data, error } = await supabase
         .from('campaigns')
         .insert([
@@ -47,6 +61,17 @@ export const createCampaign = async (name, message, totalContacts) => {
         ])
         .select()
         .single();
+
+    // After creation, we update the record with its own ID in id_campanha for consistency if needed
+    // although they will be the same UUID.
+    if (data && !error) {
+        await supabase
+            .from('campaigns')
+            .update({ id_campanha: data.id })
+            .eq('id', data.id);
+
+        data.id_campanha = data.id;
+    }
 
     return { data, error };
 };

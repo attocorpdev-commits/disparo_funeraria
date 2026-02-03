@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Send, CheckCircle, AlertTriangle, Loader2, Pause, Play, XCircle, LayoutDashboard, Info, Hash, Clock, Terminal, AlertCircle, Users } from 'lucide-react';
 
-import { createCampaign, updateCampaignStatus } from '../lib/supabase';
+import { createCampaign, updateCampaignStatus, updateContactsCampaign } from '../lib/supabase';
 
 const SendingPanel = ({ contacts, message, onReset, onViewChange }) => {
     const [status, setStatus] = useState('idle'); // idle, sending, success, error
@@ -26,7 +26,14 @@ const SendingPanel = ({ contacts, message, onReset, onViewChange }) => {
             campaignId = campaign.id;
             setCurrentCampaign(campaign);
 
+            // Update contacts with campaign ID directly in their table
+            const validContactIds = contacts.filter(c => c.isValid && c.id).map(c => c.id);
+            if (validContactIds.length > 0) {
+                await updateContactsCampaign(validContactIds, campaignId);
+            }
+
             const payload = {
+                id_campanha: campaignId, // Matching user request for column name
                 contatos: contacts.filter(c => c.isValid).map(c => ({
                     nome: c.nome,
                     telefone: c.telefone

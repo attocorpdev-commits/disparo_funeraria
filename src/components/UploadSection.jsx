@@ -66,13 +66,27 @@ const UploadSection = ({ onDataLoaded }) => {
 
                 try {
                     setIsSaving(true);
-                    const { error: saveError } = await saveContacts(validData);
-                    if (saveError) console.error('DB Save error:', saveError);
-
-                    setUploadSuccess(true);
-                    setTimeout(() => {
+                    const { data: savedContacts, error: saveError } = await saveContacts(validData);
+                    if (saveError) {
+                        console.error('DB Save error:', saveError);
+                        // Even if DB save fails, we continue with the parsed data
                         onDataLoaded(validData);
-                    }, 800);
+                    } else if (savedContacts) {
+                        // Map the DB IDs back to our local validData
+                        const enrichedData = validData.map(vd => {
+                            const dbContact = savedContacts.find(sc => sc.phone === vd.telefone);
+                            return {
+                                ...vd,
+                                id: dbContact?.id // Include the UUID from Supabase
+                            };
+                        });
+                        setUploadSuccess(true);
+                        setTimeout(() => {
+                            onDataLoaded(enrichedData);
+                        }, 800);
+                    } else {
+                        onDataLoaded(validData);
+                    }
                 } catch (err) {
                     onDataLoaded(validData);
                 } finally {
